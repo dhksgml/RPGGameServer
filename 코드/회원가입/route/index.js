@@ -3,55 +3,40 @@ const { User } = require('../model');
 
 const router = express.Router();
 
-// router.get('/',async(req, res, next)=>{
-//     try{
-//         const users = await User.findAll();
-//         console.log(users)
-//         res.json("asdf");
-//     }catch(err){
-//         console.error(err);
-//         next(err);
-//     }
-// })
-
-// router.post('/',async(req, res, next)=>{
-//     try{
-//         //console.log(req.body.nick_name);
-//         const users = await User.findOne({e_mail: req.body.e_mail},{password: req.body.password});
-//         // console.log(users)
-//         // console.log(req.body.e_mail)
-//         // console.log(users.e_mail);
-//         res.json(users.nick_name);
-        
-//     }catch(err){
-//         console.error(err);
-//         next(err);
-//     }
-// })
-
+//회원 가입
 router.post('/join', async(req, res, next)=>{
+    //1. 요청이 온 클라이언트로부터 id, nick, password를 받는다.
     let body = req.body;
     try{
-        // const user = await User.findOrCreate({
-        //     where:{id: req.body.id, nick: req.body.nick}
-        // })
-        // console.log(user);
+        //2. 3. DB를 조회하여 같은 아이디, 닉네임 있는지 찾는다.
+        const ids = await User.findOne({
+            attributes:['id'],
+            where: {id: req.body.id}
+        });
+
+        const nicks = await User.findOne({
+            attributes:['nick'],
+            where:{nick: req.body.nick}
+        });
+
         const users = await User.findOne({
             attributes:['id','nick'],
             where: {id: req.body.id, nick: req.body.nick}
         });
-
-        if(users == null){
+        //4. 없을 경우 DB에 값을 저장한다.
+        if(nicks != null){
+            res.json(3);
+        } else if(ids != null) {
+            res.json(2);
+        } else if(users == null) {
             const c = await User.create({
                 id : body.id,
                 nick : body.nick,
                 password : body.password,
-                class : 0
+                class:0
             });
-            console.log(c);
+            res.json(1);
         }
-        
-        res.json(users);
     } catch(err) {
         console.error(err);
         next(err);
