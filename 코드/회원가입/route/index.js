@@ -23,12 +23,13 @@ router.post('/join', async(req, res, next)=>{
             attributes:['id','nick'],
             where: {id: req.body.id, nick: req.body.nick}
         });
-        //4. 없을 경우 DB에 값을 저장한다.
+        //5. DB에 같은 닉네임 있는 경우
         if(nicks != null){
             res.json(3);
-        } else if(ids != null) {
+        } else if(ids != null) {    //5. DB에 같은 아이디 있는 경우
             res.json(2);
         } else if(users == null) {
+            //4. 없을 경우 DB에 값을 저장한다.
             const c = await User.create({
                 id : body.id,
                 nick : body.nick,
